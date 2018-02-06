@@ -1,0 +1,25 @@
+{
+    "name": "niirrty/web-app-template",
+    "description": "MyTemplate for building a new web application",
+    "type": "project",
+    "require": {
+        "niirrty/niirrty.db": "~0.1",
+        "niirrty/niirrty.routing": "~0.1",
+        "niirrty/niirrty.plate": "~0.2",
+        "niirrty/niirrty.translation": "~0.1",
+        "pimple/pimple": "~3.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "niirrty",
+            "email": "niirrty@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Niirrty\\Example\\": "src/php/"
+        }
+    }
+}
