@@ -1,9 +1,10 @@
-var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var less = require('gulp-less');
-var concat = require('gulp-concat');
-var minifyCSS = require('gulp-minify-css');
-var pump = require('pump');
+let gulp = require('gulp');
+let uglify = require('gulp-uglify');
+let less = require('gulp-less');
+let concat = require('gulp-concat');
+let minifyCSS = require('gulp-minify-css');
+let pump = require('pump');
+let cleanCSS = require('gulp-clean-css');
 
 var documentRoot                 = './app';
 
@@ -33,7 +34,7 @@ gulp.task( 'scripts-internals', function()
       gulp.dest( jsOutFolder )
    ] );
 });
- 
+
 gulp.task( 'scripts-externals', function()
 {
    return pump( [
@@ -45,7 +46,7 @@ gulp.task( 'scripts-externals', function()
       gulp.dest( jsOutFolder )
    ] );
 });
- 
+
 gulp.task( 'compile-less', function( cb )
 {
    return pump( [
@@ -53,22 +54,21 @@ gulp.task( 'compile-less', function( cb )
       less(),                               // Compile LESS to CSS
       concat( unminifiedCssOutFileName ),                // unminified CSS file
       gulp.dest( cssOutFolder ),             // Save the CSS file
-      minifyCSS(),                          // Minify the CSS
+      //minifyCSS(),                          // Minify the CSS
+      cleanCSS(),
       concat( minifiedCssOutFileName ),            // Concat all to a minified CSS file
       gulp.dest( cssOutFolder )              // Save the minified CSS file
    ] );
 });
- 
+
 gulp.task( 'auto-compile-less', function()
 {
-   gulp.watch( lessWatchSource, [ 'compile-less' ] );
+   gulp.watch( lessWatchSource, 'compile-less' );
 });
 
-gulp.task( 'build-all-scripts', [ 'scripts-internals', 'scripts-externals' ] );
+gulp.task( 'build-all-scripts', ['scripts-internals', 'scripts-externals']);
 
 gulp.task( 'auto-build-js', function()
 {
-   gulp.watch( jsWatchSource, [ 'build-all-scripts' ] );
+   gulp.watch( jsWatchSource, 'build-all-scripts' );
 });
-
-gulp.task( 'default', [ 'compile-less', 'auto-compile-less', 'build-all-scripts', 'auto-build-js' ] );

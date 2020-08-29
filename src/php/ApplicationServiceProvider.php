@@ -8,14 +8,14 @@
  */
 
 
-declare( strict_types = 1 );
+declare( strict_types=1 );
 
 
 namespace Niirrty\Example;
 
 
-use Niirrty\DB\Driver\SQLite as SQLiteDriver;
 use Niirrty\DB\Connection as DbConnection;
+use Niirrty\DB\Driver\SQLite as SQLiteDriver;
 use Niirrty\Example\Routes\Fallback;
 use Niirrty\Example\Routes\Home;
 use Niirrty\IO\Vfs\Handler as VfsHandler;
@@ -28,206 +28,217 @@ use Niirrty\Routing\UrlPathLocator\ILocator;
 use Niirrty\Routing\UrlPathLocator\RequestUri as RequestUriLocator;
 use Niirrty\Translation\Sources\PHPFileSource;
 use Niirrty\Translation\Translator;
-use Pimple\ServiceProviderInterface;
 use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+use function dirname;
 
 
 class ApplicationServiceProvider implements ServiceProviderInterface
 {
 
 
-   // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
+    // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
 
 
-   public function register( Container $pimple )
-   {
+    public function register( Container $pimple )
+    {
 
 
-      // Define if this is  executed in development mode
-      $pimple[ 'is_dev_mode' ] = false;
+        // Define if this is  executed in development mode
+        $pimple[ 'is_dev_mode' ] = false;
 
-      // The name of the session storage, used to store auth depending information
-      $pimple[ 'auth_storage_name' ]     = 'auth';
+        // The name of the session storage, used to store auth depending information
+        $pimple[ 'auth_storage_name' ] = 'auth';
 
 
-      // Virtual file system
-      $this->registerVfs( $pimple );
+        // Virtual file system
+        $this->registerVfs( $pimple );
 
 
-      // Locale and Translation
-      $this->registerLocaleAndTranslator( $pimple );
+        // Locale and Translation
+        $this->registerLocaleAndTranslator( $pimple );
 
 
-      // Database driver and connection
-      $this->registerDbConnection( $pimple );
+        // Database driver and connection
+        $this->registerDbConnection( $pimple );
 
 
-      // "Plate" template engine config + init
-      $this->registerTemplateEngine( $pimple );
+        // "Plate" template engine config + init
+        $this->registerTemplateEngine( $pimple );
 
 
-      $this->registerRoutes( $pimple );
+        $this->registerRoutes( $pimple );
 
 
-   }
+    }
 
 
-   // </editor-fold>
+    // </editor-fold>
 
 
-   // <editor-fold desc="// –––––––   P R I V A T E   M E T H O D S   ––––––––––––––––––––––––––––––––––––">
+    // <editor-fold desc="// –––––––   P R I V A T E   M E T H O D S   ––––––––––––––––––––––––––––––––––––">
 
-   private function registerVfs( Container $pimple )
-   {
+    private function registerVfs( Container $pimple )
+    {
 
-      // VFS handler 'files://'
-      $pimple[ 'vfs_files_handler' ] = function()
-      {
-         return VfsHandler::Create( 'Application files root folder' )
-                       ->setProtocol( 'files', '://' )
-                       ->setRootFolder( \dirname( \dirname( __DIR__ ) ) . '/files' );
-      };
+        // VFS handler 'files://'
+        $pimple[ 'vfs_files_handler' ] = function ()
+        {
 
+            return VfsHandler::Create( 'Application files root folder' )
+                             ->setProtocol( 'files', '://' )
+                             ->setRootFolder( dirname( dirname( __DIR__ ) ) . '/files' );
+        };
 
-      // The VFS Manager. It manages all VFS handlers
-      $pimple[ 'vfs_manager' ]       = function( $c )
-      {
-         return VfsManager::Create()->addHandler( $c[ 'vfs_files_handler' ] );
-      };
 
-   }
+        // The VFS Manager. It manages all VFS handlers
+        $pimple[ 'vfs_manager' ] = function ( $c )
+        {
 
-   private function registerLocaleAndTranslator( Container $pimple )
-   {
+            return VfsManager::Create()->addHandler( $c[ 'vfs_files_handler' ] );
+        };
 
-      // This are the names of the parameters, accepted from $_POST, $_GET and $_SESSION
-      $pimple[ 'locale_request_fields' ] = [ 'locale', 'language', 'lang' ];
+    }
 
+    private function registerLocaleAndTranslator( Container $pimple )
+    {
 
-      // The fallback locale if no other was found
-      $pimple[ 'default_locale' ]        = new Locale( 'de', 'DE', 'UTF-8' );
+        // This are the names of the parameters, accepted from $_POST, $_GET and $_SESSION
+        $pimple[ 'locale_request_fields' ] = [ 'locale', 'language', 'lang' ];
 
 
-      // The Locale
-      $pimple[ 'locale' ]                = function( $c )
-      {
-         return Locale::Create( $c[ 'default_locale' ], true, $c[ 'locale_request_fields' ] );
-      };
+        // The fallback locale if no other was found
+        $pimple[ 'default_locale' ] = new Locale( 'de', 'DE', 'UTF-8' );
 
 
-      // The source of translations
-      $pimple[ 'translation_source' ]    = function( $c )
-      {
-         return new PHPFileSource( 'files://i18n', $c[ 'vfs_manager' ] );
-      };
+        // The Locale
+        $pimple[ 'locale' ] = function ( $c )
+        {
 
+            return Locale::Create( $c[ 'default_locale' ], true, $c[ 'locale_request_fields' ] );
+        };
 
-      // The translator, depending to 'locale' and 'translation_source'
-      $pimple[ 'translator' ]            = function( $c )
-      {
-         return ( new Translator( $c[ 'locale' ] ) )->addSource( '_', $c[ 'translation_source' ] );
-      };
 
-   }
+        // The source of translations
+        $pimple[ 'translation_source' ] = function ( $c )
+        {
 
-   private function registerDbConnection( Container $pimple )
-   {
+            return new PHPFileSource( 'files://i18n', $c[ 'vfs_manager' ] );
+        };
 
-      // The DB driver (MySQL in this case)
-      $pimple[ 'db_driver' ]             = function( Container $pimple )
-      {
-         return ( new SQLiteDriver() )->setDb( $pimple[ 'vfs_manager' ]->parsePath( 'files://data/example.sqlite' ) );
-         // return DriverFactory::FromConfigFile( 'files://config/mysql-driver-config.yaml' );
-         // return DriverFactory::FromConfigFile( 'files://config/pgsql-driver-config.yaml' );
-      };
 
-      /// The DB connection
-      $pimple[ 'db_connection' ]         = function( $c )
-      {
-         return new DBConnection( $c[ 'db_driver' ] );
-      };
+        // The translator, depending to 'locale' and 'translation_source'
+        $pimple[ 'translator' ] = function ( $c )
+        {
 
-   }
+            return ( new Translator( $c[ 'locale' ] ) )->addSource( '_', $c[ 'translation_source' ] );
+        };
 
-   private function registerTemplateEngine( Container $pimple )
-   {
+    }
 
-      // The template engine config
-      $pimple[ 'tpl_config' ]            = function( $c )
-      {
-         return TplConfig::FromINIFile( 'files://config/plate-config.ini', 'ini', $c[ 'vfs_manager' ] )
-                         ->setCacheMode(
-                            $c[ 'is_dev_mode' ]
-                               ? TplConfig::CACHE_MODE_EDITOR
-                               : TplConfig::CACHE_MODE_USER
-                         );
-      };
+    private function registerDbConnection( Container $pimple )
+    {
 
-      // The "Plate" template engine
-      $pimple[ 'tpl_engine' ]            = function( $c )
-      {
-         return new TplEngine( $c[ 'tpl_config' ] );
-      };
+        // The DB driver (MySQL in this case)
+        $pimple[ 'db_driver' ] = function ( Container $pimple )
+        {
 
-   }
+            return ( new SQLiteDriver() )->setDb( $pimple[ 'vfs_manager' ]->parsePath( 'files://data/example.sqlite' ) );
+            // return DriverFactory::FromConfigFile( 'files://config/mysql-driver-config.yaml' );
+            // return DriverFactory::FromConfigFile( 'files://config/pgsql-driver-config.yaml' );
+        };
 
-   private function registerRoutes( Container $pimple )
-   {
+        /// The DB connection
+        $pimple[ 'db_connection' ] = function ( $c )
+        {
 
-      // Get the current called not existing URL path by $_SERVER[ 'REQUEST_URI' ]
-      $pimple[ 'url_path_locator' ] = function()
-      {
+            return new DBConnection( $c[ 'db_driver' ] );
+        };
 
-         return new RequestUriLocator();
+    }
 
-      };
+    private function registerTemplateEngine( Container $pimple )
+    {
 
-      $pimple[ 'route_fallback' ] = function( ILocator $locator ) use( $pimple )
-      {
+        // The template engine config
+        $pimple[ 'tpl_config' ] = function ( $c )
+        {
 
-         ( new Fallback( $locator, $pimple[ 'tpl_engine' ], $pimple[ 'locale' ], $pimple[ 'translator' ] ) )
-            ->run();
+            return TplConfig::FromINIFile( 'files://config/plate-config.ini', 'ini', $c[ 'vfs_manager' ] )
+                            ->setCacheMode(
+                                $c[ 'is_dev_mode' ]
+                                    ? TplConfig::CACHE_MODE_EDITOR
+                                    : TplConfig::CACHE_MODE_USER
+                            );
+        };
 
-         return true;
+        // The "Plate" template engine
+        $pimple[ 'tpl_engine' ] = function ( $c )
+        {
 
-      };
+            return new TplEngine( $c[ 'tpl_config' ] );
+        };
 
-      $pimple[ 'route_home' ] = function( ILocator $locator ) use( $pimple )
-      {
+    }
 
-         ( new Home( $locator, $pimple[ 'tpl_engine' ], $pimple[ 'locale' ], $pimple[ 'translator' ] ) )
-            ->run();
+    private function registerRoutes( Container $pimple )
+    {
 
-         return true;
+        // Get the current called not existing URL path by $_SERVER[ 'REQUEST_URI' ]
+        $pimple[ 'url_path_locator' ] = function ()
+        {
 
-      };
+            return new RequestUriLocator();
 
-      $pimple[ 'router' ] = function( Container $c )
-      {
+        };
 
-         return Router::CreateInstance()
+        $pimple[ 'route_fallback' ] = function ( ILocator $locator ) use ( $pimple )
+        {
 
-            // Handling URL paths, not declared by a route
-            ->setFallBackHandler( $c->raw( 'route_fallback' ) )
+            ( new Fallback( $locator, $pimple[ 'tpl_engine' ], $pimple[ 'locale' ], $pimple[ 'translator' ] ) )
+                ->run();
 
-            // Redirect direct /index.php calls to /
-            ->addMultiPathStaticRedirection( [ '/index.html', 'index.php' ], '/' )
+            return true;
 
-            // Application Home
-            ->addSimpleRoute( '/', $c->raw( 'route_home' ) );
+        };
 
-         /*->addRegexRoute( '~^/services/([A-Za-z0-9_.:-]+)/?$~', [
-            function( $matches ) { // $matches[ 1 ] defines the first part inside parenthesises, and so on
-               echo '<pre>';
-               print_r( $matches );
-               exit;
-            }
-         ] )*/
-      };
+        $pimple[ 'route_home' ] = function ( ILocator $locator ) use ( $pimple )
+        {
 
-   }
+            ( new Home( $locator, $pimple[ 'tpl_engine' ], $pimple[ 'locale' ], $pimple[ 'translator' ] ) )
+                ->run();
 
-   // </editor-fold>
+            return true;
+
+        };
+
+        $pimple[ 'router' ] = function ( Container $c )
+        {
+
+            return Router::CreateInstance()
+
+                // Handling URL paths, not declared by a route
+                         ->setFallBackHandler( $c->raw( 'route_fallback' ) )
+
+                // Redirect direct /index.php calls to /
+                         ->addMultiPathStaticRedirection( [ '/index.html', 'index.php' ], '/' )
+
+                // Application Home
+                         ->addSimpleRoute( '/', $c->raw( 'route_home' ) );
+
+            /*->addRegexRoute( '~^/services/([A-Za-z0-9_.:-]+)/?$~', [
+               function( $matches ) { // $matches[ 1 ] defines the first part inside parenthesises, and so on
+                  echo '<pre>';
+                  print_r( $matches );
+                  exit;
+               }
+            ] )*/
+        };
+
+    }
+
+
+    // </editor-fold>
 
 
 }

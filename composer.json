@@ -3,10 +3,11 @@
     "description": "MyTemplate for building a new web application",
     "type": "project",
     "require": {
-        "niirrty/niirrty.db": "~0.1",
-        "niirrty/niirrty.routing": "~0.1",
-        "niirrty/niirrty.plate": "~0.2",
-        "niirrty/niirrty.translation": "~0.1",
+        "niirrty/niirrty.db": "~0.3",
+        "niirrty/niirrty.routing": "~0.3",
+        "niirrty/niirrty.plate": "~0.3",
+        "niirrty/niirrty.translation": "~0.3",
+        "niirrty/niirrty.date": "~0.3",
         "pimple/pimple": "~3.2"
     },
     "license": "MIT",

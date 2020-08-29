@@ -7,7 +7,7 @@
  */
 
 
-declare( strict_types = 1 );
+declare( strict_types=1 );
 
 
 namespace Niirrty\Example\Routes;
@@ -23,69 +23,71 @@ abstract class AbstractRoute
 {
 
 
-   // <editor-fold desc="// –––––––   P R O T E C T E D   F I E L D S   ––––––––––––––––––––––––––––––––––">
-
-   /**
-    * The template engine
-    *
-    * @type \Niirrty\Plate\Engine
-    */
-   protected $_engine;
-
-   /**
-    * The template engine
-    *
-    * @type \Niirrty\Locale\Locale
-    */
-   protected $_locale;
-
-   /**
-    * The template engine
-    *
-    * @type \Niirrty\Translation\Translator
-    */
-   protected $_trans;
-
-   /**
-    * @type \Niirrty\Routing\UrlPathLocator\ILocator
-    */
-   protected $_urlPathLocator;
-
-   // </editor-fold>
+    // <editor-fold desc="// –––––––   P R O T E C T E D   F I E L D S   ––––––––––––––––––––––––––––––––––">
 
 
-   // <editor-fold desc="// –––––––   C O N S T R U C T O R   A N D / O R   D E S T R U C T O R   ––––––––">
+    /**
+     * The template engine
+     *
+     * @type Engine
+     */
+    protected $_engine;
 
-   /**
-    * AbstractRoute constructor.
-    *
-    * @param \Niirrty\Routing\UrlPathLocator\ILocator $urlPathLocator
-    * @param \Niirrty\Plate\Engine                    $tplEngine
-    * @param \Niirrty\Locale\Locale                   $locale
-    * @param \Niirrty\Translation\Translator          $translator
-    */
-   public function __construct(
-      ?ILocator $urlPathLocator, ?Engine $tplEngine, Locale $locale, Translator $translator )
-   {
+    /**
+     * The template engine
+     *
+     * @type Locale
+     */
+    protected $_locale;
 
-      $this->_engine = $tplEngine;
-      $this->_locale = $locale;
-      $this->_trans  = $translator;
-      $this->_urlPathLocator = $urlPathLocator;
+    /**
+     * The template engine
+     *
+     * @type Translator
+     */
+    protected $_trans;
 
-   }
+    /**
+     * @type ILocator
+     */
+    protected $_urlPathLocator;
 
-   // </editor-fold>
+    // </editor-fold>
 
 
-   // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
+    // <editor-fold desc="// –––––––   C O N S T R U C T O R   A N D / O R   D E S T R U C T O R   ––––––––">
 
-   /**
-    * @param array $options Optional running options :-)
-    */
-   public abstract function run( array $options = [] );
+    /**
+     * AbstractRoute constructor.
+     *
+     * @param ILocator   $urlPathLocator
+     * @param Engine     $tplEngine
+     * @param Locale     $locale
+     * @param Translator $translator
+     */
+    public function __construct(
+        ?ILocator $urlPathLocator, ?Engine $tplEngine, Locale $locale, Translator $translator )
+    {
 
-   // </editor-fold>
+        $this->_engine = $tplEngine;
+        $this->_locale = $locale;
+        $this->_trans = $translator;
+        $this->_urlPathLocator = $urlPathLocator;
+
+    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
+
+    /**
+     * @param array $options Optional running options :-)
+     */
+    public abstract function run( array $options = [] );
+
+
+    // </editor-fold>
 
 
 }

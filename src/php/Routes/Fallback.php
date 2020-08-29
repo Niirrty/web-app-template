@@ -8,7 +8,7 @@
  */
 
 
-declare( strict_types = 1 );
+declare( strict_types=1 );
 
 
 namespace Niirrty\Example\Routes;
@@ -18,17 +18,18 @@ class Fallback extends AbstractRoute
 {
 
 
-   /**
-    * @param array $options Optional running options :-)
-    */
-   public function run( array $options = [] )
-   {
+    /**
+     * @param array $options Optional running options :-)
+     */
+    public function run( array $options = [] )
+    {
 
-      echo 'FOOOO!¡!'; exit;
+        echo 'FOOOO!¡!';
+        exit;
 
-      # TODO: Here the code must be placed that outputs if a requested URL have not an associated router.
+        # TODO: Here the code must be placed that outputs if a requested URL have not an associated router.
 
-   }
+    }
 
 
 }
