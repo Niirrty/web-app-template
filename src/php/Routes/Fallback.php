@@ -1,10 +1,10 @@
 <?php
 /**
  * @author         Ni Irrty <niirrty+code@gmail.com>
- * @copyright  (c) 2017, Ni Irrty
+ * @copyright  (c) 2017-2026, Ni Irrty
  * @license        MIT
  * @since          2018-02-05
- * @version        0.1.0
+ * @version        0.6.4
  */
 
 

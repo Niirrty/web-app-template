@@ -1,10 +1,10 @@
 <?php
 /**
  * @author         Ni Irrty <niirrty+code@gmail.com>
- * @copyright  (c) 2017, Ni Irrty
+ * @copyright  (c) 2017-2026, Ni Irrty
  * @license        MIT
  * @since          2018-02-05
- * @version        0.1.0
+ * @version        0.6.4
  */
 
 
@@ -18,10 +18,11 @@ use Niirrty\DB\Connection as DbConnection;
 use Niirrty\DB\Driver\SQLite as SQLiteDriver;
 use Niirrty\Example\Routes\Fallback;
 use Niirrty\Example\Routes\Home;
-use Niirrty\IO\Vfs\Handler as VfsHandler;
-use Niirrty\IO\Vfs\Manager as VfsManager;
+use Niirrty\IO\Vfs\VfsHandler;
+use Niirrty\IO\Vfs\VfsManager;
 use Niirrty\Locale\Locale;
-use Niirrty\Plate\Config as TplConfig;
+use Niirrty\Plate\CacheMode;
+use Niirrty\Plate\Config as TemplateConfig;
 use Niirrty\Plate\Engine as TplEngine;
 use Niirrty\Routing\Router;
 use Niirrty\Routing\UrlPathLocator\ILocator;
@@ -30,15 +31,13 @@ use Niirrty\Translation\Sources\PHPFileSource;
 use Niirrty\Translation\Translator;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use function dirname;
 
 
 class ApplicationServiceProvider implements ServiceProviderInterface
 {
 
 
-    // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
-
+    #region –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––
 
     public function register( Container $pimple )
     {
@@ -72,11 +71,10 @@ class ApplicationServiceProvider implements ServiceProviderInterface
 
     }
 
+    #endregion
 
-    // </editor-fold>
 
-
-    // <editor-fold desc="// –––––––   P R I V A T E   M E T H O D S   ––––––––––––––––––––––––––––––––––––">
+    #region –––––––   P R I V A T E   M E T H O D S   ––––––––––––––––––––––––––––––––––––
 
     private function registerVfs( Container $pimple )
     {
@@ -85,9 +83,13 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         $pimple[ 'vfs_files_handler' ] = function ()
         {
 
-            return VfsHandler::Create( 'Application files root folder' )
-                             ->setProtocol( 'files', '://' )
-                             ->setRootFolder( dirname( dirname( __DIR__ ) ) . '/files' );
+            return VfsHandler::Create(
+                'Application files root folder',
+                'files',
+                '://',
+                \dirname( __DIR__, 2 ) . '/files'
+            );
+
         };
 
 
@@ -96,6 +98,7 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         {
 
             return VfsManager::Create()->addHandler( $c[ 'vfs_files_handler' ] );
+
         };
 
     }
@@ -124,6 +127,7 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         {
 
             return new PHPFileSource( 'files://i18n', $c[ 'vfs_manager' ] );
+
         };
 
 
@@ -132,6 +136,7 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         {
 
             return ( new Translator( $c[ 'locale' ] ) )->addSource( '_', $c[ 'translation_source' ] );
+
         };
 
     }
@@ -144,15 +149,16 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         {
 
             return ( new SQLiteDriver() )->setDb( $pimple[ 'vfs_manager' ]->parsePath( 'files://data/example.sqlite' ) );
-            // return DriverFactory::FromConfigFile( 'files://config/mysql-driver-config.yaml' );
-            // return DriverFactory::FromConfigFile( 'files://config/pgsql-driver-config.yaml' );
+            // return DriverFactory::FromConfigFile( $pimple[ 'vfs_manager' ]->parsePath( 'files://config/mysql-driver-config.yaml' ) );
+            // return DriverFactory::FromConfigFile( $pimple[ 'vfs_manager' ]->parsePath( 'files://config/pgsql-driver-config.yaml' ) );
         };
 
         /// The DB connection
         $pimple[ 'db_connection' ] = function ( $c )
         {
 
-            return new DBConnection( $c[ 'db_driver' ] );
+            return new DbConnection( $c[ 'db_driver' ] );
+
         };
 
     }
@@ -164,19 +170,17 @@ class ApplicationServiceProvider implements ServiceProviderInterface
         $pimple[ 'tpl_config' ] = function ( $c )
         {
 
-            return TplConfig::FromINIFile( 'files://config/plate-config.ini', 'ini', $c[ 'vfs_manager' ] )
-                            ->setCacheMode(
-                                $c[ 'is_dev_mode' ]
-                                    ? TplConfig::CACHE_MODE_EDITOR
-                                    : TplConfig::CACHE_MODE_USER
-                            );
+            return TemplateConfig::FromINIFile( 'files://config/plate-config.ini', 'ini', $c[ 'vfs_manager' ] )
+                ->setCacheMode( $c[ 'is_dev_mode' ] ? CacheMode::EDITOR : CacheMode::USER );
+
         };
 
         // The "Plate" template engine
         $pimple[ 'tpl_engine' ] = function ( $c )
         {
 
-            return new TplEngine( $c[ 'tpl_config' ] );
+            return new TplEngine( $c[ 'tpl_config' ], $c[ 'translator' ] );
+
         };
 
     }
@@ -237,8 +241,7 @@ class ApplicationServiceProvider implements ServiceProviderInterface
 
     }
 
-
-    // </editor-fold>
+    #endregion
 
 
 }

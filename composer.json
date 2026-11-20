@@ -1,14 +1,15 @@
 {
     "name": "niirrty/web-app-template",
     "description": "MyTemplate for building a new web application",
+    "version": "0.6.4",
     "type": "project",
     "require": {
-        "niirrty/niirrty.db": "~0.3",
-        "niirrty/niirrty.routing": "~0.3",
-        "niirrty/niirrty.plate": "~0.3",
-        "niirrty/niirrty.translation": "~0.3",
-        "niirrty/niirrty.date": "~0.3",
-        "pimple/pimple": "~3.2"
+        "niirrty/niirrty.db": "~0.6.4",
+        "niirrty/niirrty.routing": "~0.6.4",
+        "niirrty/niirrty.plate": "~0.6.4",
+        "niirrty/niirrty.translation": "~0.6.4",
+        "niirrty/niirrty.date": "~0.6.4",
+        "pimple/pimple": "~3.6"
     },
     "license": "MIT",
     "authors": [

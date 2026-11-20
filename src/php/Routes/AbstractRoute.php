@@ -1,11 +1,10 @@
 <?php
 /**
  * @author         Ni Irrty <niirrty+code@gmail.com>
- * @copyright  (c) 2017, Ni Irrty
- * @since          13.12.17
- * @version        0.1.0
+ * @copyright  (c) 2017-2026, Ni Irrty
+ * @since          2017-12-13
+ * @version        0.6.4
  */
-
 
 declare( strict_types=1 );
 
@@ -23,47 +22,46 @@ abstract class AbstractRoute
 {
 
 
-    // <editor-fold desc="// –––––––   P R O T E C T E D   F I E L D S   ––––––––––––––––––––––––––––––––––">
-
-
-    /**
-     * The template engine
-     *
-     * @type Engine
-     */
-    protected $_engine;
+    #region –––––––   P R O T E C T E D   F I E L D S   ––––––––––––––––––––––––––––––––––
 
     /**
      * The template engine
      *
-     * @type Locale
+     * @var Engine|null
      */
-    protected $_locale;
+    protected ?Engine $_engine;
 
     /**
      * The template engine
      *
-     * @type Translator
+     * @var Locale
      */
-    protected $_trans;
+    protected Locale $_locale;
 
     /**
-     * @type ILocator
+     * The template engine
+     *
+     * @var Translator
      */
-    protected $_urlPathLocator;
+    protected Translator $_trans;
 
-    // </editor-fold>
+    /**
+     * @var ILocator|null
+     */
+    protected ?ILocator $_urlPathLocator;
+
+    #endregion
 
 
-    // <editor-fold desc="// –––––––   C O N S T R U C T O R   A N D / O R   D E S T R U C T O R   ––––––––">
+    #region –––––––   C O N S T R U C T O R   A N D / O R   D E S T R U C T O R   ––––––––
 
     /**
      * AbstractRoute constructor.
      *
-     * @param ILocator   $urlPathLocator
-     * @param Engine     $tplEngine
-     * @param Locale     $locale
-     * @param Translator $translator
+     * @param ILocator|null   $urlPathLocator
+     * @param Engine|null     $tplEngine
+     * @param Locale          $locale
+     * @param Translator      $translator
      */
     public function __construct(
         ?ILocator $urlPathLocator, ?Engine $tplEngine, Locale $locale, Translator $translator )
@@ -76,10 +74,10 @@ abstract class AbstractRoute
 
     }
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––">
+    #region –––––––   P U B L I C   M E T H O D S   ––––––––––––––––––––––––––––––––––––––
 
     /**
      * @param array $options Optional running options :-)
@@ -87,7 +85,7 @@ abstract class AbstractRoute
     public abstract function run( array $options = [] );
 
 
-    // </editor-fold>
+    #endregion
 
 
 }
